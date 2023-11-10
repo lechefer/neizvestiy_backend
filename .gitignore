@@ -1,0 +1,5 @@
+.vscode
+*.exe
+debug
+.idea
+gonkey/allure

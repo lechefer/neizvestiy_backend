@@ -1,0 +1,545 @@
+definitions:
+  entity.QuestType:
+    enum:
+    - route
+    type: string
+    x-enum-varnames:
+    - RouteQuestType
+  handler.getAchievementResponse:
+    properties:
+      description:
+        type: string
+      icon:
+        type: string
+      id:
+        type: string
+      is_completed:
+        type: boolean
+      name:
+        type: string
+      passed:
+        type: integer
+      steps:
+        type: integer
+    type: object
+  handler.getEncyclopediaItemResponse:
+    properties:
+      description:
+        type: string
+      id:
+        type: string
+      settlementId:
+        type: string
+      title:
+        type: string
+    type: object
+  handler.getQuestResponse:
+    properties:
+      description:
+        type: string
+      duration:
+        type: integer
+      id:
+        type: string
+      name:
+        type: string
+      preview:
+        $ref: '#/definitions/handler.image'
+      reward:
+        type: number
+      settlement_id:
+        type: string
+      steps:
+        items:
+          $ref: '#/definitions/handler.getQuestResponseStep'
+        type: array
+      type:
+        $ref: '#/definitions/entity.QuestType'
+    type: object
+  handler.getQuestResponseStep:
+    properties:
+      address:
+        type: string
+      email:
+        type: string
+      id:
+        type: string
+      images:
+        items:
+          $ref: '#/definitions/handler.image'
+        type: array
+      latitude:
+        type: number
+      longitude:
+        type: number
+      name:
+        type: string
+      order:
+        type: integer
+      phone:
+        type: string
+      place_type:
+        type: string
+      quest_id:
+        type: string
+      schedule:
+        items:
+          $ref: '#/definitions/handler.getQuestResponseStepSchedule'
+        type: array
+      website:
+        type: string
+    type: object
+  handler.getQuestResponseStepSchedule:
+    properties:
+      from_to:
+        type: string
+      week_day:
+        type: string
+    type: object
+  handler.image:
+    properties:
+      sizes:
+        $ref: '#/definitions/handler.sizes'
+    type: object
+  handler.listAchievementResponseElement:
+    properties:
+      description:
+        type: string
+      icon:
+        type: string
+      id:
+        type: string
+      is_completed:
+        type: boolean
+      name:
+        type: string
+      passed:
+        type: integer
+      steps:
+        type: integer
+    type: object
+  handler.listEncyclopediaItemElement:
+    properties:
+      description:
+        type: string
+      id:
+        type: string
+      settlement_id:
+        type: string
+      title:
+        type: string
+    type: object
+  handler.listEncyclopediaItemRequest:
+    properties:
+      settlement_id:
+        type: string
+    type: object
+  handler.listQuestsResponseElement:
+    properties:
+      description:
+        type: string
+      duration:
+        type: integer
+      id:
+        type: string
+      name:
+        type: string
+      preview:
+        $ref: '#/definitions/handler.image'
+      reward:
+        type: number
+      settlement_id:
+        type: string
+      type:
+        $ref: '#/definitions/entity.QuestType'
+    type: object
+  handler.searchSettlementsResponseElement:
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+    type: object
+  handler.size:
+    properties:
+      size:
+        type: string
+      url:
+        type: string
+    type: object
+  handler.sizes:
+    properties:
+      m:
+        $ref: '#/definitions/handler.size'
+      o:
+        $ref: '#/definitions/handler.size'
+      x:
+        $ref: '#/definitions/handler.size'
+    type: object
+  shttp.ResponseError:
+    properties:
+      description:
+        type: string
+      error_code:
+        type: integer
+      ok:
+        type: boolean
+      result: {}
+    type: object
+  shttp.ResponseOk:
+    properties:
+      description:
+        type: string
+      error_code:
+        type: integer
+      ok:
+        type: boolean
+      result: {}
+    type: object
+  shttp.ResponseWithDetails-handler_getAchievementResponse:
+    properties:
+      description:
+        type: string
+      error_code:
+        type: integer
+      ok:
+        type: boolean
+      result:
+        $ref: '#/definitions/handler.getAchievementResponse'
+    type: object
+  shttp.ResponseWithDetails-handler_getEncyclopediaItemResponse:
+    properties:
+      description:
+        type: string
+      error_code:
+        type: integer
+      ok:
+        type: boolean
+      result:
+        $ref: '#/definitions/handler.getEncyclopediaItemResponse'
+    type: object
+  shttp.ResponseWithDetails-handler_getQuestResponse:
+    properties:
+      description:
+        type: string
+      error_code:
+        type: integer
+      ok:
+        type: boolean
+      result:
+        $ref: '#/definitions/handler.getQuestResponse'
+    type: object
+  shttp.ResponseWithDetails-handler_listAchievementResponse:
+    properties:
+      description:
+        type: string
+      error_code:
+        type: integer
+      ok:
+        type: boolean
+      result:
+        items:
+          $ref: '#/definitions/handler.listAchievementResponseElement'
+        type: array
+    type: object
+  shttp.ResponseWithDetails-handler_listEncyclopediaItemResponse:
+    properties:
+      description:
+        type: string
+      error_code:
+        type: integer
+      ok:
+        type: boolean
+      result:
+        items:
+          $ref: '#/definitions/handler.listEncyclopediaItemElement'
+        type: array
+    type: object
+  shttp.ResponseWithDetails-handler_listQuestsResponse:
+    properties:
+      description:
+        type: string
+      error_code:
+        type: integer
+      ok:
+        type: boolean
+      result:
+        items:
+          $ref: '#/definitions/handler.listQuestsResponseElement'
+        type: array
+    type: object
+  shttp.ResponseWithDetails-handler_searchSettlementsResponse:
+    properties:
+      description:
+        type: string
+      error_code:
+        type: integer
+      ok:
+        type: boolean
+      result:
+        items:
+          $ref: '#/definitions/handler.searchSettlementsResponseElement'
+        type: array
+    type: object
+  shttp.ResponseWithDetails-string:
+    properties:
+      description:
+        type: string
+      error_code:
+        type: integer
+      ok:
+        type: boolean
+      result:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /api/achievements/{AccountId}/{AchievementId}:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: Идентификатор достижения
+        in: path
+        name: AchievementId
+        required: true
+        type: string
+      - description: Идентификатор аккаунта
+        in: path
+        name: AccountId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/shttp.ResponseWithDetails-handler_getAchievementResponse'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/shttp.ResponseError'
+        "404":
+          description: Not found
+          schema:
+            $ref: '#/definitions/shttp.ResponseError'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/shttp.ResponseError'
+      summary: Получение достижения
+      tags:
+      - Achievements
+  /api/achievements/list:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - in: query
+        name: account_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/shttp.ResponseWithDetails-handler_listAchievementResponse'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/shttp.ResponseError'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/shttp.ResponseError'
+      summary: Получение достижений
+      tags:
+      - Achievements
+  /api/ping:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/shttp.ResponseWithDetails-string'
+      summary: Пинг сервиса
+      tags:
+      - Служебные
+  /api/quests/{questId}:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: Идентификатор квеста
+        in: path
+        name: questId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/shttp.ResponseWithDetails-handler_getQuestResponse'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/shttp.ResponseError'
+        "404":
+          description: Not found
+          schema:
+            $ref: '#/definitions/shttp.ResponseError'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/shttp.ResponseError'
+      summary: Получение информации о квесте
+      tags:
+      - Quests
+  /api/quests/list:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - in: query
+        name: settlement_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/shttp.ResponseWithDetails-handler_listQuestsResponse'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/shttp.ResponseError'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/shttp.ResponseError'
+      summary: Получение квестов
+      tags:
+      - Quests
+  /api/settlements/search:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - in: query
+        name: query
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/shttp.ResponseWithDetails-handler_searchSettlementsResponse'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/shttp.ResponseError'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/shttp.ResponseError'
+      summary: Поиск города
+      tags:
+      - Settlements
+  /api/wiki/{EncyclopediaItemId}:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: Идентификатор элемента энциклопедии
+        in: path
+        name: EncyclopediaItemId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/shttp.ResponseWithDetails-handler_getEncyclopediaItemResponse'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/shttp.ResponseError'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/shttp.ResponseError'
+      summary: Получение элемента энциклопедии
+      tags:
+      - Wiki
+  /api/wiki/create:
+    post:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Ok" //хз как тут сделать
+          schema:
+            $ref: '#/definitions/shttp.ResponseOk'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/shttp.ResponseError'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/shttp.ResponseError'
+      summary: Создание элемента энциклопедии
+      tags:
+      - Wiki
+  /api/wiki/list:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Параметры выборки
+        in: body
+        name: Body
+        required: true
+        schema:
+          $ref: '#/definitions/handler.listEncyclopediaItemRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/shttp.ResponseWithDetails-handler_listEncyclopediaItemResponse'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/shttp.ResponseError'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/shttp.ResponseError'
+      summary: Получение элементов энциклопедии
+      tags:
+      - Wiki
+securityDefinitions:
+  ExternalId:
+    in: header
+    name: ExternalId
+    type: apiKey
+swagger: "2.0"

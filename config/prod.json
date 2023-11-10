@@ -1,0 +1,20 @@
+{
+  "port": "80",
+  "databases": {
+    "postgres": {
+      "connectionString": "postgres://smolathon:smolathon@postgres:5432/smolathon",
+      "migrationPath": "./migration"
+    }
+  },
+  "s3": {
+    "endpoint": "hb.bizmrg.com",
+    "buckets": {
+      "Main": {
+        "name": "smolathon-image-bucket",
+        "publicDomain": "smolathon-image-bucket.hb.ru-msk.vkcs.cloud"
+      }
+    },
+    "accessKeyId": "3U5Z4wWZBztSjcG8UAiY89",
+    "secretKey": "61WTsXVpS2sQSpetmy6SygJ8bCJ31wDwNHAEFLhEGVmJ"
+  }
+}

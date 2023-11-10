@@ -1,0 +1,30 @@
+version: '3.9'
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: smolathon-api
+    restart: unless-stopped
+    environment:
+      ENV: prod
+    depends_on:
+      - postgres
+    ports:
+      - "5743:80"
+
+  postgres:
+    image: postgres:16.0
+    container_name: smolathon-postgres
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: smolathon
+      POSTGRES_PASSWORD: smolathon
+      POSTGRES_DB: smolathon
+    ports:
+      - "5466:5432"
+
+volumes:
+  postgres-data:
