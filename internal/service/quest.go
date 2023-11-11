@@ -6,6 +6,7 @@ import (
 	"errors"
 	"github.com/google/uuid"
 	"smolathon/internal/entity"
+	"strings"
 )
 
 type QuestService struct {
@@ -40,8 +41,8 @@ func (qs *QuestService) List(ctx context.Context, options entity.ListQuestsOptio
 	return quests, nil
 }
 
-func (qs *QuestService) Get(ctx context.Context, questId uuid.UUID) (entity.Quest, error) {
-	quest, err := qs.questRepo.GetQuest(ctx, questId)
+func (qs *QuestService) Get(ctx context.Context, accountId string, questId uuid.UUID) (entity.Quest, error) {
+	quest, err := qs.questRepo.GetQuest(ctx, accountId, questId)
 	switch {
 	case err == nil:
 	case errors.Is(err, sql.ErrNoRows):
@@ -60,6 +61,48 @@ func (qs *QuestService) Get(ctx context.Context, questId uuid.UUID) (entity.Ques
 		if err != nil {
 			return entity.Quest{}, err
 		}
+	}
+
+	return quest, nil
+}
+
+func (qs *QuestService) Start(ctx context.Context, accountId string, questId uuid.UUID) (entity.Quest, error) {
+	err := qs.questRepo.StartQuest(ctx, accountId, questId)
+	switch {
+	case err == nil:
+	case strings.Contains(err.Error(), "duplicate key"):
+		return entity.Quest{}, ErrAlreadyExists
+	default:
+		return entity.Quest{}, err
+	}
+
+	quest, err := qs.Get(ctx, accountId, questId)
+	switch {
+	case err == nil:
+	case errors.Is(err, sql.ErrNoRows):
+		return entity.Quest{}, ErrNotFound
+	default:
+		return entity.Quest{}, err
+	}
+
+	return quest, nil
+}
+
+func (qs *QuestService) EndStep(ctx context.Context, accountId string, questStepId uuid.UUID) (entity.Quest, error) {
+	err := qs.questRepo.EndQuestStep(ctx, accountId, questStepId)
+	switch {
+	case err == nil:
+	default:
+		return entity.Quest{}, err
+	}
+
+	quest, err := qs.Get(ctx, accountId, questStepId)
+	switch {
+	case err == nil:
+	case errors.Is(err, sql.ErrNoRows):
+		return entity.Quest{}, ErrNotFound
+	default:
+		return entity.Quest{}, err
 	}
 
 	return quest, nil

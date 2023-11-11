@@ -5,6 +5,11 @@ definitions:
     type: string
     x-enum-varnames:
     - RouteQuestType
+  handler.accountCreateRequest:
+    properties:
+      account_id:
+        type: string
+    type: object
   handler.getAchievementResponse:
     properties:
       description:
@@ -41,6 +46,8 @@ definitions:
         type: integer
       id:
         type: string
+      is_active:
+        type: boolean
       name:
         type: string
       preview:
@@ -86,6 +93,8 @@ definitions:
         items:
           $ref: '#/definitions/handler.getQuestResponseStepSchedule'
         type: array
+      status:
+        type: string
       website:
         type: string
     type: object
@@ -142,6 +151,8 @@ definitions:
         type: integer
       id:
         type: string
+      is_active:
+        type: boolean
       name:
         type: string
       preview:
@@ -150,6 +161,46 @@ definitions:
         type: number
       settlement_id:
         type: string
+      type:
+        $ref: '#/definitions/entity.QuestType'
+    type: object
+  handler.listRiddlesResponseElement:
+    properties:
+      description:
+        type: string
+      id:
+        type: string
+      letters:
+        type: string
+      name:
+        type: string
+      quest_step_id:
+        type: string
+      status:
+        type: string
+    type: object
+  handler.questStepEndResponse:
+    properties:
+      description:
+        type: string
+      duration:
+        type: integer
+      id:
+        type: string
+      is_active:
+        type: boolean
+      name:
+        type: string
+      preview:
+        $ref: '#/definitions/handler.image'
+      reward:
+        type: number
+      settlement_id:
+        type: string
+      steps:
+        items:
+          $ref: '#/definitions/handler.getQuestResponseStep'
+        type: array
       type:
         $ref: '#/definitions/entity.QuestType'
     type: object
@@ -175,6 +226,46 @@ definitions:
         $ref: '#/definitions/handler.size'
       x:
         $ref: '#/definitions/handler.size'
+    type: object
+  handler.startQuestResponse:
+    properties:
+      description:
+        type: string
+      duration:
+        type: integer
+      id:
+        type: string
+      is_active:
+        type: boolean
+      name:
+        type: string
+      preview:
+        $ref: '#/definitions/handler.image'
+      reward:
+        type: number
+      settlement_id:
+        type: string
+      steps:
+        items:
+          $ref: '#/definitions/handler.getQuestResponseStep'
+        type: array
+      type:
+        $ref: '#/definitions/entity.QuestType'
+    type: object
+  handler.updateRiddleResponse:
+    properties:
+      description:
+        type: string
+      id:
+        type: string
+      letters:
+        type: string
+      name:
+        type: string
+      quest_step_id:
+        type: string
+      status:
+        type: string
     type: object
   shttp.ResponseError:
     properties:
@@ -268,6 +359,30 @@ definitions:
           $ref: '#/definitions/handler.listQuestsResponseElement'
         type: array
     type: object
+  shttp.ResponseWithDetails-handler_listRiddlesResponse:
+    properties:
+      description:
+        type: string
+      error_code:
+        type: integer
+      ok:
+        type: boolean
+      result:
+        items:
+          $ref: '#/definitions/handler.listRiddlesResponseElement'
+        type: array
+    type: object
+  shttp.ResponseWithDetails-handler_questStepEndResponse:
+    properties:
+      description:
+        type: string
+      error_code:
+        type: integer
+      ok:
+        type: boolean
+      result:
+        $ref: '#/definitions/handler.questStepEndResponse'
+    type: object
   shttp.ResponseWithDetails-handler_searchSettlementsResponse:
     properties:
       description:
@@ -280,6 +395,28 @@ definitions:
         items:
           $ref: '#/definitions/handler.searchSettlementsResponseElement'
         type: array
+    type: object
+  shttp.ResponseWithDetails-handler_startQuestResponse:
+    properties:
+      description:
+        type: string
+      error_code:
+        type: integer
+      ok:
+        type: boolean
+      result:
+        $ref: '#/definitions/handler.startQuestResponse'
+    type: object
+  shttp.ResponseWithDetails-handler_updateRiddleResponse:
+    properties:
+      description:
+        type: string
+      error_code:
+        type: integer
+      ok:
+        type: boolean
+      result:
+        $ref: '#/definitions/handler.updateRiddleResponse'
     type: object
   shttp.ResponseWithDetails-string:
     properties:
@@ -295,6 +432,39 @@ definitions:
 info:
   contact: {}
 paths:
+  /api/accounts/create:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Данные аккаунта
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/handler.accountCreateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/shttp.ResponseWithDetails-string'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/shttp.ResponseError'
+        "409":
+          description: Already exists
+          schema:
+            $ref: '#/definitions/shttp.ResponseError'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/shttp.ResponseError'
+      summary: Создание аккаунта
+      tags:
+      - Accounts
   /api/achievements/{AccountId}/{AchievementId}:
     get:
       consumes:
@@ -373,11 +543,16 @@ paths:
       summary: Пинг сервиса
       tags:
       - Служебные
-  /api/quests/{questId}:
+  /api/quests/{accountId}/{questId}:
     get:
       consumes:
       - application/json
       parameters:
+      - description: Идентификатор пользователя
+        in: path
+        name: accountId
+        required: true
+        type: string
       - description: Идентификатор квеста
         in: path
         name: questId
@@ -411,6 +586,10 @@ paths:
       - application/json
       parameters:
       - in: query
+        name: account_id
+        required: true
+        type: string
+      - in: query
         name: settlement_id
         required: true
         type: string
@@ -432,6 +611,152 @@ paths:
       summary: Получение квестов
       tags:
       - Quests
+  /api/quests/start/{accountId}/{questId}:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Идентификатор пользователя
+        in: path
+        name: accountId
+        required: true
+        type: string
+      - description: Идентификатор квеста
+        in: path
+        name: questId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/shttp.ResponseWithDetails-handler_startQuestResponse'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/shttp.ResponseError'
+        "404":
+          description: Not found
+          schema:
+            $ref: '#/definitions/shttp.ResponseError'
+        "409":
+          description: Already exists
+          schema:
+            $ref: '#/definitions/shttp.ResponseError'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/shttp.ResponseError'
+      summary: Начало квеста
+      tags:
+      - Quests
+  /api/quests/step/end/{accountId}/{questStepId}:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Идентификатор пользователя
+        in: path
+        name: accountId
+        required: true
+        type: string
+      - description: Идентификатор шага квеста
+        in: path
+        name: questStepId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/shttp.ResponseWithDetails-handler_questStepEndResponse'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/shttp.ResponseError'
+        "404":
+          description: Not found
+          schema:
+            $ref: '#/definitions/shttp.ResponseError'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/shttp.ResponseError'
+      summary: Победа над босом
+      tags:
+      - Quests
+  /api/riddles/{accountId}/{riddleId}:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Идентификатор пользователя
+        in: path
+        name: accountId
+        required: true
+        type: string
+      - description: Идентификатор загадки
+        in: path
+        name: riddleId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/shttp.ResponseWithDetails-handler_updateRiddleResponse'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/shttp.ResponseError'
+        "409":
+          description: Already exists
+          schema:
+            $ref: '#/definitions/shttp.ResponseError'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/shttp.ResponseError'
+      summary: Обновление загадки
+      tags:
+      - Riddles
+  /api/riddles/list:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - in: query
+        name: account_id
+        required: true
+        type: string
+      - in: query
+        name: quest_step_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/shttp.ResponseWithDetails-handler_listRiddlesResponse'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/shttp.ResponseError'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/shttp.ResponseError'
+      summary: Получение квестов
+      tags:
+      - Riddles
   /api/settlements/search:
     get:
       consumes:

@@ -15,6 +15,7 @@ type Quest struct {
 	Type         QuestType
 	AvgDuration  time.Duration
 	Reward       decimal.Decimal
+	IsActive     bool
 
 	Steps []QuestStep
 }
@@ -42,6 +43,8 @@ type QuestStep struct {
 
 	Latitude  float64
 	Longitude float64
+
+	Status string
 }
 
 type Schedule struct {
@@ -64,5 +67,6 @@ const (
 )
 
 type ListQuestsOptions struct {
+	AccountId    string
 	SettlementId uuid.UUID
 }

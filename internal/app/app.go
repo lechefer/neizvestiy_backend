@@ -34,14 +34,16 @@ type App struct {
 	questRepo       *repository.QuestRepository
 	settlementRepo  *repository.SettlementRepository
 	achievementRepo *repository.AchievementRepository
+	riddleRepo      *repository.RiddleRepository
+	accountRepo     *repository.AccountRepository
 
 	// services
-	questService      *service.QuestService
-	settlementService *service.SettlementService
-
-	imageService *service.ImageService
-
+	questService       *service.QuestService
+	settlementService  *service.SettlementService
+	imageService       *service.ImageService
 	achievementService *service.AchievementService
+	riddleService      *service.RiddleService
+	accountService     *service.AccountService
 }
 
 func NewApp(l slogger.Logger, config config.Config, contextProvider sctx.DefaultContextProviderFunc) (*App, error) {
@@ -86,6 +88,8 @@ func (a *App) initDatabases() error {
 	a.questRepo = repository.NewQuestRepository(a.pgDb)
 	a.settlementRepo = repository.NewSettlementRepository(a.pgDb)
 	a.achievementRepo = repository.NewAchievementRepository(a.pgDb)
+	a.riddleRepo = repository.NewRiddleRepository(a.pgDb)
+	a.accountRepo = repository.NewAccountRepository(a.pgDb)
 
 	return nil
 }
@@ -96,6 +100,9 @@ func (a *App) initServices() error {
 	a.questService = service.NewQuestService(a.imageService, a.questRepo)
 	a.settlementService = service.NewSettlementService(a.settlementRepo)
 	a.achievementService = service.NewAchievementService(a.achievementRepo)
+	a.riddleService = service.NewRiddleService(a.riddleRepo)
+	a.accountService = service.NewAccountService(a.accountRepo)
+
 	a.Server = api.NewServer(
 		a.config.Port,
 		a.logger,
@@ -103,6 +110,8 @@ func (a *App) initServices() error {
 		a.questService,
 		a.settlementService,
 		a.achievementService,
+		a.riddleService,
+		a.accountService,
 	)
 
 	return nil

@@ -23,6 +23,7 @@ func QuestMapFromDb(quest models.Quest) entity.Quest {
 		Type:         entity.QuestType(quest.Type),
 		AvgDuration:  quest.AvgDuration,
 		Reward:       quest.Reward,
+		IsActive:     quest.IsActive,
 		Steps:        QuestStepSliceMapFromDb(quest.Steps),
 	}
 }
@@ -52,5 +53,6 @@ func QuestStepMapFromDb(questStep models.QuestStep) entity.QuestStep {
 		Schedule:  schedule,
 		Latitude:  questStep.Location.P.X,
 		Longitude: questStep.Location.P.Y,
+		Status:    questStep.Status,
 	}
 }

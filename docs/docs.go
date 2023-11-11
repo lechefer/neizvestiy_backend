@@ -16,6 +16,57 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/api/accounts/create": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Accounts"
+                ],
+                "summary": "Создание аккаунта",
+                "parameters": [
+                    {
+                        "description": "Данные аккаунта",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.accountCreateRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/shttp.ResponseWithDetails-string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "$ref": "#/definitions/shttp.ResponseError"
+                        }
+                    },
+                    "409": {
+                        "description": "Already exists",
+                        "schema": {
+                            "$ref": "#/definitions/shttp.ResponseError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/shttp.ResponseError"
+                        }
+                    }
+                }
+            }
+        },
         "/api/achievements/list": {
             "get": {
                 "consumes": [
@@ -151,6 +202,12 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
+                        "name": "account_id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
                         "name": "settlement_id",
                         "in": "query",
                         "required": true
@@ -178,7 +235,125 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/quests/{questId}": {
+        "/api/quests/start/{accountId}/{questId}": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Quests"
+                ],
+                "summary": "Начало квеста",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Идентификатор пользователя",
+                        "name": "accountId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Идентификатор квеста",
+                        "name": "questId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/shttp.ResponseWithDetails-handler_startQuestResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "$ref": "#/definitions/shttp.ResponseError"
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "schema": {
+                            "$ref": "#/definitions/shttp.ResponseError"
+                        }
+                    },
+                    "409": {
+                        "description": "Already exists",
+                        "schema": {
+                            "$ref": "#/definitions/shttp.ResponseError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/shttp.ResponseError"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/quests/step/end/{accountId}/{questStepId}": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Quests"
+                ],
+                "summary": "Победа над босом",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Идентификатор пользователя",
+                        "name": "accountId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Идентификатор шага квеста",
+                        "name": "questStepId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/shttp.ResponseWithDetails-handler_questStepEndResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "$ref": "#/definitions/shttp.ResponseError"
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "schema": {
+                            "$ref": "#/definitions/shttp.ResponseError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/shttp.ResponseError"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/quests/{accountId}/{questId}": {
             "get": {
                 "consumes": [
                     "application/json"
@@ -191,6 +366,13 @@ const docTemplate = `{
                 ],
                 "summary": "Получение информации о квесте",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Идентификатор пользователя",
+                        "name": "accountId",
+                        "in": "path",
+                        "required": true
+                    },
                     {
                         "type": "string",
                         "description": "Идентификатор квеста",
@@ -214,6 +396,110 @@ const docTemplate = `{
                     },
                     "404": {
                         "description": "Not found",
+                        "schema": {
+                            "$ref": "#/definitions/shttp.ResponseError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/shttp.ResponseError"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/riddles/list": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Riddles"
+                ],
+                "summary": "Получение квестов",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "name": "account_id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "name": "quest_step_id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/shttp.ResponseWithDetails-handler_listRiddlesResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "$ref": "#/definitions/shttp.ResponseError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/shttp.ResponseError"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/riddles/{accountId}/{riddleId}": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Riddles"
+                ],
+                "summary": "Обновление загадки",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Идентификатор пользователя",
+                        "name": "accountId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Идентификатор загадки",
+                        "name": "riddleId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/shttp.ResponseWithDetails-handler_updateRiddleResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "$ref": "#/definitions/shttp.ResponseError"
+                        }
+                    },
+                    "409": {
+                        "description": "Already exists",
                         "schema": {
                             "$ref": "#/definitions/shttp.ResponseError"
                         }
@@ -401,6 +687,14 @@ const docTemplate = `{
                 "RouteQuestType"
             ]
         },
+        "handler.accountCreateRequest": {
+            "type": "object",
+            "properties": {
+                "account_id": {
+                    "type": "string"
+                }
+            }
+        },
         "handler.getAchievementResponse": {
             "type": "object",
             "properties": {
@@ -455,6 +749,9 @@ const docTemplate = `{
                 },
                 "id": {
                     "type": "string"
+                },
+                "is_active": {
+                    "type": "boolean"
                 },
                 "name": {
                     "type": "string"
@@ -523,6 +820,9 @@ const docTemplate = `{
                     "items": {
                         "$ref": "#/definitions/handler.getQuestResponseStepSchedule"
                     }
+                },
+                "status": {
+                    "type": "string"
                 },
                 "website": {
                     "type": "string"
@@ -611,6 +911,9 @@ const docTemplate = `{
                 "id": {
                     "type": "string"
                 },
+                "is_active": {
+                    "type": "boolean"
+                },
                 "name": {
                     "type": "string"
                 },
@@ -622,6 +925,67 @@ const docTemplate = `{
                 },
                 "settlement_id": {
                     "type": "string"
+                },
+                "type": {
+                    "$ref": "#/definitions/entity.QuestType"
+                }
+            }
+        },
+        "handler.listRiddlesResponseElement": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "letters": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "quest_step_id": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
+        "handler.questStepEndResponse": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "duration": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "is_active": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "preview": {
+                    "$ref": "#/definitions/handler.image"
+                },
+                "reward": {
+                    "type": "number"
+                },
+                "settlement_id": {
+                    "type": "string"
+                },
+                "steps": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/handler.getQuestResponseStep"
+                    }
                 },
                 "type": {
                     "$ref": "#/definitions/entity.QuestType"
@@ -661,6 +1025,67 @@ const docTemplate = `{
                 },
                 "x": {
                     "$ref": "#/definitions/handler.size"
+                }
+            }
+        },
+        "handler.startQuestResponse": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "duration": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "is_active": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "preview": {
+                    "$ref": "#/definitions/handler.image"
+                },
+                "reward": {
+                    "type": "number"
+                },
+                "settlement_id": {
+                    "type": "string"
+                },
+                "steps": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/handler.getQuestResponseStep"
+                    }
+                },
+                "type": {
+                    "$ref": "#/definitions/entity.QuestType"
+                }
+            }
+        },
+        "handler.updateRiddleResponse": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "letters": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "quest_step_id": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
                 }
             }
         },
@@ -805,6 +1230,43 @@ const docTemplate = `{
                 }
             }
         },
+        "shttp.ResponseWithDetails-handler_listRiddlesResponse": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "error_code": {
+                    "type": "integer"
+                },
+                "ok": {
+                    "type": "boolean"
+                },
+                "result": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/handler.listRiddlesResponseElement"
+                    }
+                }
+            }
+        },
+        "shttp.ResponseWithDetails-handler_questStepEndResponse": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "error_code": {
+                    "type": "integer"
+                },
+                "ok": {
+                    "type": "boolean"
+                },
+                "result": {
+                    "$ref": "#/definitions/handler.questStepEndResponse"
+                }
+            }
+        },
         "shttp.ResponseWithDetails-handler_searchSettlementsResponse": {
             "type": "object",
             "properties": {
@@ -822,6 +1284,40 @@ const docTemplate = `{
                     "items": {
                         "$ref": "#/definitions/handler.searchSettlementsResponseElement"
                     }
+                }
+            }
+        },
+        "shttp.ResponseWithDetails-handler_startQuestResponse": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "error_code": {
+                    "type": "integer"
+                },
+                "ok": {
+                    "type": "boolean"
+                },
+                "result": {
+                    "$ref": "#/definitions/handler.startQuestResponse"
+                }
+            }
+        },
+        "shttp.ResponseWithDetails-handler_updateRiddleResponse": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "error_code": {
+                    "type": "integer"
+                },
+                "ok": {
+                    "type": "boolean"
+                },
+                "result": {
+                    "$ref": "#/definitions/handler.updateRiddleResponse"
                 }
             }
         },

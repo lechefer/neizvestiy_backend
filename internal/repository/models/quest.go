@@ -16,7 +16,8 @@ type Quest struct {
 	Type         string          `db:"type"`
 	AvgDuration  time.Duration   `db:"avg_duration"`
 	Reward       decimal.Decimal `db:"reward"`
-
+	IsActive     bool            `db:"is_active"`
+	
 	Steps []QuestStep
 }
 
@@ -34,4 +35,6 @@ type QuestStep struct {
 	Schedule  string `db:"schedule"`
 
 	Location pgtype.Point `db:"location"`
+
+	Status string `db:"status"`
 }

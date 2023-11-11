@@ -36,6 +36,8 @@ func NewServer(
 	questService *service.QuestService,
 	settlementService *service.SettlementService,
 	achievementService *service.AchievementService,
+	riddleService *service.RiddleService,
+	accountService *service.AccountService,
 ) *Server {
 	r := gin.New()
 
@@ -61,13 +63,26 @@ func NewServer(
 		questGroup := apiGroup.Group("/quests")
 		{
 			questGroup.GET("/list", handler.ListQuests(logger, questService))
-			questGroup.GET("/:questId", handler.GetQuest(logger, questService))
+			questGroup.GET("/:accountId/:questId", handler.GetQuest(logger, questService))
+			questGroup.POST("/start/:accountId/:questId", handler.StartQuest(logger, questService))
+			questGroup.POST("/step/end/:accountId/:questStepId", handler.QuestStepEnd(logger, questService))
 		}
 
 		achievementGroup := apiGroup.Group("/achievements")
 		{
 			achievementGroup.GET("/:accountId/:achievementId", handler.GetAchievement(logger, achievementService))
 			achievementGroup.GET("/list", handler.ListAchievements(logger, achievementService))
+		}
+
+		riddleGroup := apiGroup.Group("/riddles")
+		{
+			riddleGroup.GET("/list", handler.ListRiddles(logger, riddleService))
+			riddleGroup.POST("/:accountId/:riddleId", handler.UpdateRiddle(logger, riddleService))
+		}
+
+		accountGroup := apiGroup.Group("/accounts")
+		{
+			accountGroup.POST("/create", handler.AccountCreate(logger, accountService))
 		}
 	}
 

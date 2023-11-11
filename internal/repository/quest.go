@@ -25,6 +25,7 @@ func (r *QuestRepository) ListQuests(ctx context.Context, options entity.ListQue
 	var questsModel []models.Quest
 
 	args := []interface{}{
+		options.AccountId,
 		options.SettlementId,
 	}
 
@@ -35,7 +36,7 @@ func (r *QuestRepository) ListQuests(ctx context.Context, options entity.ListQue
 	return mapper.QuestSliceMapFromDb(questsModel), nil
 }
 
-func (r *QuestRepository) GetQuest(ctx context.Context, questId uuid.UUID) (entity.Quest, error) {
+func (r *QuestRepository) GetQuest(ctx context.Context, accountId string, questId uuid.UUID) (entity.Quest, error) {
 	tx, err := r.db.BeginTxx(ctx, nil)
 	if err != nil {
 		return entity.Quest{}, err
@@ -44,11 +45,11 @@ func (r *QuestRepository) GetQuest(ctx context.Context, questId uuid.UUID) (enti
 
 	var questModel models.Quest
 
-	if err = tx.GetContext(ctx, &questModel, query.GetQuestSql, questId); err != nil {
+	if err = tx.GetContext(ctx, &questModel, query.GetQuestSql, accountId, questId); err != nil {
 		return entity.Quest{}, err
 	}
 
-	if questModel.Steps, err = r.getQuestSteps(ctx, tx, questId); err != nil {
+	if questModel.Steps, err = r.getQuestSteps(ctx, tx, accountId, questId); err != nil {
 		return entity.Quest{}, err
 	}
 
@@ -59,12 +60,24 @@ func (r *QuestRepository) GetQuest(ctx context.Context, questId uuid.UUID) (enti
 	return mapper.QuestMapFromDb(questModel), nil
 }
 
-func (r *QuestRepository) getQuestSteps(ctx context.Context, tx *sqlx.Tx, questId uuid.UUID) ([]models.QuestStep, error) {
+func (r *QuestRepository) getQuestSteps(ctx context.Context, tx *sqlx.Tx, accountId string, questId uuid.UUID) ([]models.QuestStep, error) {
 	var questStepModels []models.QuestStep
 
-	if err := tx.SelectContext(ctx, &questStepModels, query.GetQuestStepsSql, questId); err != nil {
+	if err := tx.SelectContext(ctx, &questStepModels, query.GetQuestStepsSql, accountId, questId); err != nil {
 		return nil, err
 	}
 
 	return questStepModels, nil
+}
+
+func (r *QuestRepository) StartQuest(ctx context.Context, accountId string, questId uuid.UUID) error {
+	_, err := r.db.ExecContext(ctx, query.StartQuestSql, accountId, questId)
+
+	return err
+}
+
+func (r *QuestRepository) EndQuestStep(ctx context.Context, accountId string, questStepId uuid.UUID) error {
+	_, err := r.db.ExecContext(ctx, query.EndQuestStepSql, accountId, questStepId)
+
+	return err
 }
